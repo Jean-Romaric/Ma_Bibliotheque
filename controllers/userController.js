@@ -1,19 +1,27 @@
 //(2)
 const db = require('../config/db');
 
+// controllers/userController.js
+const userModel = require('../models/userModel');
+
 const getAllUsers = (req, res) => {
-    // Logique pour récupérer tous les utilisateurs
-    const sql = 'SELECT * FROM Utilisateur';
-    db.query(sql, (err, result) => {
-       if (err) {
-       console.error('Erreur lors de la requête :', err);
-       return;
-               }
-         res.status(200).json(result); // On envoie les utilisateurs au navigateur (ou Postman)
-         console.log('Résultats :', result); // Affiche les lignes récupérées
-   });   
+    userModel.getAllUsers((err, users) => {
+        if (err) {
+            return res.status(500).json({ error: 'Erreur serveur' });
+        }
+        res.status(200).json(users);
+    });
 };
 
+module.exports = {
+    getAllUsers
+};
+
+
+const getOneUser = (req, res) => {
+   // Logique pour afficher un utilisateur
+
+}  
 
 const createUser = (req, res) => {
     // Logique pour créer un utilisateur
@@ -49,9 +57,14 @@ const updateUser = (req, res) => {
     res.send('Modifier un utilisateur');
 }
 
-
 const deleteUser = () => {
     // Logique pour suprimer un utilisateur un utilisateur
 }
 
-module.exports = {getAllUsers,createUser,updateUser,deleteUser};
+module.exports = {
+getAllUsers,
+createUser,
+updateUser,
+deleteUser,
+getOneUser
+};
