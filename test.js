@@ -1,44 +1,5 @@
-//(2)
-const db = require('../config/db');
 const bcrypt = require('bcrypt');
-
-// controllers/userController.js
-const userModel = require('../models/userModel');
-
-const getAllUsers = (req, res) => {
-    const sql = 'SELECT * FROM Utilisateur';
-
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error('Erreur lors de la récupération des utilisateurs :', err);
-            return res.status(500).json({ error: 'Erreur serveur' });
-        }
-
-        res.status(200).json(results);
-    });
-};
-
-
-
-const getOneUser = (req, res) => {
-    //Logique pour afficher un utilisateur
-
-    const userId = req.params.id;
-    const sql = 'SELECT * FROM Utilisateur WHERE Utilisateur_ID = ?';
-
-    db.query(sql, [userId], (err, results) => {
-        if (err) {
-            console.error('Erreur lors de la récupération de l\'utilisateur :', err);
-            return res.status(500).json({ error: 'Erreur serveur' });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'Utilisateur non trouvé' });
-        }
-
-        res.status(200).json(results[0]); // On retourne le premier utilisateur trouvé
-    });
-};
+const db = require('../config/db');
 
 const createUser = async (req, res) => {
   const { nom, Prenoms, email, Mot_de_passe } = req.body;
@@ -61,11 +22,11 @@ const createUser = async (req, res) => {
     }
 
     if (results.length > 0) {
-      return res.status(409).json({ message: 'Cet utilisateur exist déjà ' });
+      return res.status(409).json({ message: 'Cet email est déjà utilisé' });
     }
 
     try {
-      //Hachage du mot de passe
+      // 🔐 Hachage du mot de passe
       const hashedPassword = await bcrypt.hash(Mot_de_passe, 10); // 10 = nombre de "rounds"
 
       const insertSql = 'INSERT INTO Utilisateur (Nom, Prenoms, Email, Mot_de_passe) VALUES (?, ?, ?, ?)';
@@ -87,21 +48,4 @@ const createUser = async (req, res) => {
   });
 };
 
-
-
-const updateUser = (req, res) => {
-    // Logique pour modifier un utilisateur
-    res.send('Modifier un utilisateur');
-}
-
-const deleteUser = () => {
-    // Logique pour suprimer un utilisateur un utilisateur
-}
-
-module.exports = {
-getAllUsers,
-createUser,
-updateUser,
-deleteUser,
-getOneUser
-};
+module.exports = { createUser };
