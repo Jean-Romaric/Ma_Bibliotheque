@@ -8,9 +8,9 @@ router.get('/users',userController.getAllUsers);
 router.get('/user/:id',userController.getOneUser);
 
 router.post('/register',userController.createUser);
-router.post('/login',userController.createUser);
+router.post('/login',userController.connetUser);
 
-router.put('/user',userController.updateUser);
+router.put('/user/:id',userController.updateUser);
 
 router.delete('/user',userController.deleteUser);
 
