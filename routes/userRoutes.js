@@ -1,4 +1,4 @@
-//(1)C'est les routes on fait d'abord
+//(3)C'est les routes on fait d'abord
 const express = require('express');
 const router = express.Router();//Router() est une fonction du module Express.
                                   //Mais se fichier c'est objet router
@@ -12,8 +12,8 @@ router.post('/login',userController.connetUser);
 
 router.put('/user/:id',userController.updateUser);
 
-router.delete('/user',userController.deleteUser);
+router.delete('/user/:id',userController.deleteUser);
 
-//Pour accéder au methode du module  userController ?
+//Pour accéder au methode du module  userCo ntroller ?
 
 module.exports = router; // exporter l'objet pour etre utiliser dans server.js

@@ -6,7 +6,7 @@ const verifierAdmin = require('../middlewares/verifierAdmin');
 const verifierToken = require('../middlewares/verifierToken');
 
 
-// Définir la route qui utilise le contrôleur
+// Définir la route qui utilise le contrôleur ,
 router.get('/livres', livreController.getAllBooks);
 router.get('/livre/:id',livreController.getOneBook); //verifierToken je ne met ps parceque n'importe qui peut voir un livre
 

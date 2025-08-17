@@ -1,5 +1,4 @@
-// controllers/livreController.js
-const { NULL } = require('mysql/lib/protocol/constants/types');
+const mysql = require('mysql2'); 
 const db = require('../config/db');
 
 const getAllBooks = (req, res) => {
@@ -32,51 +31,38 @@ const getOneBook = (req, res) => {
 }
 
 const createBook = (req, res) => {
-  const { Titre, Auteur, Annee_publication, Genre, Image_livre } = req.body;
+  const { Titre, Auteur, Annee_publication, Genre, Image_livre, Quantite } = req.body;
 
-  if (!Titre || !Auteur || !Annee_publication || !Genre || !Image_livre) {
+  if (!Titre || !Auteur || !Annee_publication || !Genre || !Image_livre || !Quantite ) {
     return res.status(400).json({ message: 'Tous les champs sont requis' });
   }
 
   const checkSql = `
-    SELECT * FROM Livre
-    WHERE Titre = ? AND Auteur = ? AND Annee_publication = ? AND Genre = ? AND Image_livre = ?
-  `;
+      SELECT * FROM Livre
+      WHERE Titre = ? AND Auteur = ? AND Annee_publication = ? AND Genre = ? 
+  `;// j'enveler image perceque l'image
 
-  db.query(checkSql, [Titre, Auteur, Annee_publication, Genre, Image_livre], (err, results) => {
+  db.query(checkSql, [Titre, Auteur, Annee_publication, Genre], (err, results) => { // j'enveler image perceque l'image 
+                                                                                    // l'image peut etre diferent pas sont extention
     if (err) {
       console.error('Erreur lors de la vérification du livre :', err);
       return res.status(500).json({ message: 'Erreur serveur' });
     }
-
+      console.log(results);
     if (results.length > 0) {
-      // 📌 Le livre existe déjà → on incrémente la quantité
-      const updateSql = `
-        UPDATE Livre
-        SET Quantite = Quantite + 1
-        WHERE Titre = ? AND Auteur = ? AND Annee_publication = ? AND Genre = ? AND Image_livre = ?
-      `;
-      db.query(updateSql, [Titre, Auteur, Annee_publication, Genre, Image_livre], (updateErr) => {
-        if (updateErr) {
-          console.error('Erreur lors de la mise à jour de la quantité :', updateErr);
-          return res.status(500).json({ message: 'Erreur serveur' });
-        }
 
-        return res.status(200).json({ message: 'livre ajouté avec succès' });
-      });
+       return res.status(500).json({ message: 'livre deja ajouté' });//
 
     } else {
-      // 📌 Le livre n'existe pas → on l’insère avec Quantite = 1
       const insertSql = `
         INSERT INTO Livre (Titre, Auteur, Annee_publication, Genre, Image_livre, Quantite)
         VALUES (?, ?, ?, ?, ?, ?)
       `;
-      db.query(insertSql, [Titre, Auteur, Annee_publication, Genre, Image_livre, 1], (insertErr) => {
+      db.query(insertSql, [Titre, Auteur, Annee_publication, Genre, Image_livre, Quantite ], (insertErr) => {
         if (insertErr) {
           console.error('Erreur lors de l\'ajout du livre :', insertErr);
           return res.status(500).json({ message: 'Erreur serveur' });
         }
-
         return res.status(201).json({ message: 'Livre ajouté avec succès' });
       });
     }
@@ -86,39 +72,44 @@ const createBook = (req, res) => {
 const updateBook = (req, res) => {
             //Récupérer les données
   const livreId = req.params.id; // ID du livre depuis l'URL
-  const { Titre, Auteur, Annee_publication, Genre, Image_livre } = req.body;
+  const { Titre, Auteur, Annee_publication, Genre, Image_livre, Quantite } = req.body;
 
+    //on vas verifier d"abord, si le livre est unique 
+    //Pour ne pas qu'il modifie le Titre, la dt de publication d'un livre pour mettre a celui 
+    //d"un autre livre. //ex id:1 Titre: Rebelle livre a modifier => petit prince id:2 Titre: Rebelle 
+    //Resultat on id:1 Titre: Rebelle, id:2 Titre: Rebelle.
+   let fields = [];
+   let values = [];
 
-            //Vérifier si le livre existe       
-  const checkSql = 'SELECT * FROM Livre WHERE Livre_ID = ?';     
-  db.query(checkSql, [livreId], (err, results) => {     
-    if (err) {
-      console.error('Erreur lors de la vérification du livre :', err);
-      return res.status(500).json({ message: 'Erreur serveur' });
+    if(Titre){
+        fields.push("Titre = ?"); values.push(Titre);
+    } 
+    if(Auteur){
+      fields.push("Auteur = ?"); values.push(Auteur);
     }
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'Livre non trouvé' });
+    if(Annee_publication){
+      fields.push("Annee_publication = ?"); values.push(Annee_publication); 
     }
+    if(Genre){
+      fields.push("Genre = ?"); values.push(Genre);
+    }
+    if(Image_livre){
+      fields.push("Image_livre = ?"); values.push(Image_livre);
+    }
+    if(Quantite){
+      fields.push("Quantite = ?"); values.push(Quantite);
+    }
+    values.push(livreId)
 
-            //Effectuer la mise à jour
-    const updateSql = `
-      UPDATE Livre
-      SET Titre = ?, Auteur = ?, Annee_publication = ?, Genre = ?, Image_livre = ?
-      WHERE Livre_ID = ?
-    `;
-
-    db.query(updateSql, [Titre, Auteur, Annee_publication, Genre, Image_livre, livreId], (updateErr) => {
-      if (updateErr) {
-        console.error('Erreur lors de la mise à jour du livre :', updateErr);
-        return res.status(500).json({ message: 'Erreur serveur' });
+  const  updateBookSql = `UPDATE Livre SET ${fields.join(", ")} WHERE Livre_ID = ?`;
+    db.query(updateBookSql,values,(err, result)=>{
+      if(err){
+        console.error('erreur SQL :', err);
+        res.status(500).json({ messge: 'Erreur serveur'});
       }
-
-      return res.status(200).json({ message: 'Livre modifié avec succès' });
+      res.json({ message: 'Livre modifier avec succès'});
     });
-  });
 };
-  
 
 const deleteBook = (req, res) => {
   const livreId = req.params.id; // Récupérer l’ID du livre
@@ -151,5 +142,6 @@ const deleteBook = (req, res) => {
 };
 
 module.exports = { getAllBooks, getOneBook, createBook, updateBook, deleteBook };
+
 
 
