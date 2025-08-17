@@ -3,8 +3,9 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+require("dotenv").config();
 
-const JWT_SECRET = 'ma_cle_secrete'; // tu peux changer cette valeur
+const JWT_SECRET = process.env.JWT_SECRET; // tu peux changer cette valeur
 // controllers/userController.js
 const userModel = require('../models/userModel');
 

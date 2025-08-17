@@ -7,6 +7,7 @@ const getAllBooks = (req, res) => {
     db.query(sql,(err, results)=> {
         if(err){
             console.error('Erreur lors de la recupération des livres',err)
+            console.log(err);
             return res.status(500).json({error:'Erreur serveur'});
         }
         res.status(200).json(results);

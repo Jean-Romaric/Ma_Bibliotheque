@@ -15,8 +15,8 @@ const userRoutes = require('./routes/userRoutes');
 const livreRoutes = require('./routes/livreRoutes');
 const empruntRoutes = require('./routes/empruntRoutes');
 const eleveRoutes = require('./routes/eleveRoutes')
-const port = 8000;
 
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(cors());

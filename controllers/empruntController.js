@@ -17,7 +17,7 @@
           db.query(selectUserIdSql,[Utilisateur_ID],(err, results)=>{
                if(err){
                     console.error("Erreur serveur: ", err);
-                    res.status(500).json({message:"Erreur serveur"});
+                    res.status(500).json({error:"Erreur serveur"});
                }
                console.log(results);
 
