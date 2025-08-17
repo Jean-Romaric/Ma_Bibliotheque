@@ -37,7 +37,7 @@ app.get('/profil', verifierToken, (req, res) => {
 });
 
 app.get('/', (req, res) => { //req et res sont des objets qui ont des methodes
-  res.send('Home Page ',{utilisateur: req.utilisateur });
+  res.send('Home Page 😎 ',{utilisateur: req.utilisateur });
 })
 console.log('Backend héberger !!')
 //app.use(getAllUsers);
