@@ -3,9 +3,8 @@ const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-require("dotenv").config();
 
-const JWT_SECRET = process.env.JWT_SECRET; // tu peux changer cette valeur
+const JWT_SECRET = 'ma_cle_secrete'; // tu peux changer cette valeur
 // controllers/userController.js
 const userModel = require('../models/userModel');
 
@@ -103,7 +102,7 @@ const connetUser = (req, res) => {
     
       // Création du token JWT
       const token = jwt.sign(
-        { id: util.Utilisateur_ID, mon: util.Nom, role: util.Role, },JWT_SECRET,{ expiresIn: '1h' } //mon: util.Nom
+        { id: util.Utilisateur_ID, nom: util.Nom, role: util.Role, },JWT_SECRET,{ expiresIn: '1h' } //mon: util.Nom
       );
       // Sauvegarder le token dans la table Session
       const expiration = new Date(Date.now() + 60 * 60 * 1000); // 1h

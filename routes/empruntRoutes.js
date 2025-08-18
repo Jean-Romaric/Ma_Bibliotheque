@@ -4,7 +4,8 @@ const empruntController = require('../controllers/empruntController');
 const verifierToken = require('../middlewares/verifierToken');
 
 
-router.post('/emprunt/:Livre_ID',verifierToken,empruntController.createEmprunt);//pour enregistrer qu’un utilisateur commence à lire un livre.
+router.post('/emprunt/:Livre_ID', verifierToken, empruntController.createEmprunt);//pour enregistrer qu’un utilisateur commence à lire un livre.
+router.put('/emprunt/terminer/:Livre_ID', verifierToken, empruntController.empruntTerminer)
 
 router.get('/emprunt/user/:id',empruntController.getOneEmprunt);//lire/utilisateur/:id pour récupérer l’historique de lecture d’un utilisateur.
 
