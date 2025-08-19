@@ -1,7 +1,6 @@
 const { json } = require('express');
 const db = require('../config/db');
 
-
 const Date_Lecture = new Date();
 const En_Cours_Lect = 1;
 
@@ -33,8 +32,6 @@ const createEmprunt = (req, res) => {
         }
     });
 }
-
-
 //PATH pour fin lecture
 const empruntTerminer = (req, res)=>{
     const Livre_ID = req.params.Livre_ID;
@@ -72,28 +69,87 @@ const empruntTerminer = (req, res)=>{
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const getAllEmprunts = (req, res) => {
+const historiqueEmprunt = (req, res) => {
     // Logique pour récupérer tous les emprunts
+    const Utilisateur_ID = req.utilisateur.id;
+    const historiqueEmpruntSql = `SELECT Livre.Titre, Livre.Image_livre, Emprunt.Debut_Lecture, Emprunt.Fin_Lecture, Emprunt.En_Cours_Lect
+  FROM Livre
+ INNER JOIN Emprunt ON Livre.Livre_ID = Emprunt.Livre_ID
+ WHERE Emprunt.Utilisateur_ID = ?;
+ `;
+    db.query(historiqueEmpruntSql, [Utilisateur_ID], (err, results)=>{
+     if(err){
+          console.error("Erreur serveur: ", err);
+          return res.status(500).json({message:"Erreur serveur"});
+     }
+     if(results.length === 0){
+          return res.status(200).json({ message: "Aucun livre lu pour le moment" });
+
+     }
+     res.status(200).json({
+     message: "Historique récupéré avec succès",
+     //utilisateur: Utilisateur_ID,
+     historique: results
+     });
+
+    });
    
 }
+
+const livrePlusLu = (req, res) => {
+    const livrePlusLuSql = `
+        SELECT Livre.Titre, Livre.Image_livre, COUNT(Emprunt.Livre_ID) AS total_lectures
+        FROM Emprunt
+        INNER JOIN Livre ON Livre.Livre_ID = Emprunt.Livre_ID
+        GROUP BY Emprunt.Livre_ID
+        ORDER BY total_lectures DESC
+        LIMIT 1;
+    `;
+
+    db.query(livrePlusLuSql, (err, results) => {
+        if (err) {
+            console.error("Erreur serveur: ", err);
+            return res.status(500).json({ message: "Erreur serveur" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: "Aucun livre trouvé" });
+        }
+
+        res.status(200).json({
+            message: "Livre le plus lu",
+            livre: results[0]
+        });
+    });
+};
+
+const livreMoinsLu = (req, res) => {
+    const livreMoinsLuSql = `
+        SELECT Livre.Titre, Livre.Image_livre, COUNT(Emprunt.Livre_ID) AS total_lectures
+        FROM Emprunt
+        INNER JOIN Livre ON Livre.Livre_ID = Emprunt.Livre_ID
+        GROUP BY Emprunt.Livre_ID
+        ORDER BY total_lectures ASC
+        LIMIT 1;
+    `;
+
+    db.query(livreMoinsLuSql, (err, results) => {
+        if (err) {
+            console.error("Erreur serveur: ", err);
+            return res.status(500).json({ message: "Erreur serveur" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: "Aucun livre trouvé" });
+        }
+
+        res.status(200).json({
+            message: "Livre le moins lu",
+            livre: results[0]
+        });
+    });
+};
+
 
 const getOneEmprunt = (req, res) => {
      // Logique pour récupérer un livre
@@ -110,20 +166,17 @@ const getOneEmprunt = (req, res) => {
 });
 
 }
-
 const updateEmprunt = (req, res) => {
-
 //Pas utile
 }
-
 const deleteEmprunt = (req, res) => {
      
 }
 
-module.exports = {getAllEmprunts,
-     getOneEmprunt,
-     createEmprunt,
-     updateEmprunt, 
-     deleteEmprunt,
+module.exports = {
+     historiqueEmprunt,
+     livrePlusLu,
+     livreMoinsLu,
+     createEmprunt, 
      empruntTerminer
     }

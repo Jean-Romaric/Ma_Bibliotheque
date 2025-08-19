@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
-const JWT_SECRET = 'ma_cle_secrete'; // tu peux changer cette valeur
+const JWT_SECRET = process.env.JWT_SECRET; // tu peux changer cette valeur
 // controllers/userController.js
 const userModel = require('../models/userModel');
 
@@ -47,6 +47,12 @@ const createUser =  (req, res) => {
    if (!regexEmail.test(Email)) { //<=> si l'email n'et pas defini et repecte pas la forme du regex
     return res.status(400).json({ message: 'Email invalide' });
    }
+
+   const regexNomPrenoms = /^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ '\-][A-Za-zÀ-ÖØ-öø-ÿ]+)*$/;
+    if (!regexNomPrenoms.test(Nom) || !regexNomPrenoms.test(Prenoms)) {
+      return res.status(400).json({ message: 'Nom ou prénoms invalides' });
+    }
+
    // Vérifier si l'email existe déjà
    const checkSql = 'SELECT * FROM Utilisateur WHERE Email = ?';
    db.query(checkSql, [Email], async (err, results) => {

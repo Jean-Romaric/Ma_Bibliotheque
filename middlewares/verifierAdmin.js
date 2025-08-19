@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const secretKey = 'ma_cle_secrete'; // la même utilisée pour créer le token
+const secretKey = process.env.JWT_SECRET; // la même utilisée pour créer le token
 
 const verifierAdmin = (req, res, next) => {
   // Récupération du token dans l'en-tête Authorizatinon

@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken');
 
 const verifierToken = (req, res, next) => {
+  const secretKey = process.env.JWT_SECRET;
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ message: 'Token manquant' });
   }
   const token = authHeader.split(' ')[1];
-  jwt.verify(token, 'ma_cle_secrete', (err, util) => {
+  jwt.verify(token, secretKey, (err, util) => {
     if (err) {
       return res.status(403).json({ message: 'Token invalide' });
     }//utilisateur(..)

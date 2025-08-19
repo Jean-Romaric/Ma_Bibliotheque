@@ -27,7 +27,7 @@ const getOneBook = (req, res) => {
             if ( results.length === 0){
                  return res.status(404).json({ message:'Livre non trouvé' });
             }
-            res.status(200).json(results[0]);
+            res.status(200).json(results[0]);//on peut ajouter un message a chaque res
         })
 }
 
@@ -142,7 +142,12 @@ const deleteBook = (req, res) => {
   });
 };
 
-module.exports = { getAllBooks, getOneBook, createBook, updateBook, deleteBook };
+module.exports = { 
+  getAllBooks, 
+  getOneBook, 
+  createBook, 
+  updateBook, 
+  deleteBook };
 
 
 
